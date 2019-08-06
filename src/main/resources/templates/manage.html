@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<title>Manage</title>
+<script>
+function postData(url, data) {
+  const form = new URLSearchParams();
+  for (let key of Object.keys(data)) {
+    form.append(key, data[key]);
+  }
+
+  return fetch(url, {
+    method: 'POST', // *GET, POST, PUT, DELETE, etc.
+    mode: 'cors', // no-cors, cors, *same-origin
+    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+    credentials: 'same-origin', // include, *same-origin, omit
+
+    redirect: 'follow', // manual, *follow, error
+    referrer: 'no-referrer', // no-referrer, *client
+    body: form, // body data type must match "Content-Type" header
+  })
+  .then(response => response.json()); // parses JSON response into native JavaScript objects
+}
+function runQuery() {
+  let sql = document.getElementById('sql').value;
+  postData('/query', {"sql": sql}).then(result => {
+    var header = result["head"];
+    var body = result["body"];
+
+    var table = "";
+    var cols = header.length;
+    table += "<tr>";
+    for (let i = 0;i < cols;i++) {
+      table += "<th>" + header[i] + "</th>";
+    }
+    table += "</tr>";
+
+    for (let row of body) {
+      table += "<tr>";
+      for (let i = 0;i < cols;i++) {
+        table += "<td>" + row[i] + "</td>";
+      }
+      table += "</tr>";
+    }
+    document.getElementById('result').innerHTML = "<table>" + table + "</table>";
+
+  });
+}
+</script>
+</head>
+<body>
+<h1>Mane</h1>
+
+<textarea id="sql" cols="30" rows="10"></textarea>
+<input type="button" onclick="runQuery()" value="Run">
+
+<div id="result"></div>
+</body>
+</html>
