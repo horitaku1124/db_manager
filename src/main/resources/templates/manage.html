@@ -6,7 +6,33 @@
       content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 <title>Manage</title>
+<style>
+  #contents {
+    display: flex;
+  }
+  #contents aside{
+    width: 100px;
+  }
+</style>
 <script>
+const dataKey = 'aiueo';
+let openedIndex = null;
+function loadData() {
+  let data = localStorage.getItem(dataKey);
+  if (data) {
+    return JSON.parse(data);
+  }
+  return [];
+}
+function saveData(data) {
+  let newData = [];
+  for (row of data) {
+    if (row) {
+      newData.push(row);
+    }
+  }
+  localStorage.setItem(dataKey, JSON.stringify(newData));
+}
 function postData(url, data) {
   const form = new URLSearchParams();
   for (let key of Object.keys(data)) {
@@ -50,14 +76,71 @@ function runQuery() {
 
   });
 }
+function saveDialog() {
+  let saveName = window.prompt("Enter your name : ", "");
+  if (saveName) {
+    let allData = loadData();
+    let sql = document.getElementById('sql').value;
+    allData.push({name: saveName, sql: sql});
+    saveData(allData);
+  }
+}
+
+function openLink(index) {
+  let allData = loadData();
+  let row = allData[index];
+  openedIndex = index;
+  document.getElementById('sql').value = row["sql"];
+  document.getElementById('update_button').removeAttribute("disabled");
+  document.getElementById('delete_button').removeAttribute("disabled");
+}
+
+function refreshList() {
+  let allData = loadData();
+  let links = "";
+  for (let i = 0;i < allData.length;i++) {
+    let row = allData[i];
+    links += "<p onclick='openLink(" + i + ")'>" + row['name'] + "</p>";
+  }
+  document.getElementById('links').innerHTML = links;
+}
+document.addEventListener("DOMContentLoaded", () => {
+  refreshList();
+});
+
+function updateQuery() {
+  let allData = loadData();
+  allData[openedIndex]["sql"] = document.getElementById('sql').value;
+  saveData(allData);
+}
+function deleteQuery() {
+  if (window.confirm("Are you sure to delete?")) {
+    let allData = loadData();
+    delete allData[openedIndex];
+    saveData(allData);
+    openedIndex = null;
+    document.getElementById('update_button').setAttribute("disabled", "disabled");
+    document.getElementById('delete_button').setAttribute("disabled", "disabled");
+    refreshList();
+  }
+}
 </script>
 </head>
 <body>
 <h1>Mane</h1>
+<section id="contents">
+  <aside id="links">
 
-<textarea id="sql" cols="30" rows="10"></textarea>
-<input type="button" onclick="runQuery()" value="Run">
+  </aside>
+  <article>
+    <textarea id="sql" cols="30" rows="10"></textarea>
+    <input type="button" onclick="runQuery()" value="Run">
+    <input type="button" onclick="saveDialog()" value="Save">
+    <input type="button" onclick="updateQuery()" value="Update" id="update_button" disabled="disabled">
+    <input type="button" onclick="deleteQuery()" value="Delete" id="delete_button" disabled="disabled">
 
-<div id="result"></div>
+    <div id="result"></div>
+  </article>
+</section>
 </body>
 </html>
