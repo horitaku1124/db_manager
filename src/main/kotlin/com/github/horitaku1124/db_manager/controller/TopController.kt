@@ -1,26 +1,18 @@
 package com.github.horitaku1124.db_manager.controller
 
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseBody
-import javax.persistence.EntityManager
-import javax.persistence.PersistenceContext
-import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.beans.factory.annotation.Autowired
+import java.util.*
 import javax.sql.DataSource
-import java.util.ArrayList
-
-
 
 
 @Controller
 class TopController {
   private val logger = LoggerFactory.getLogger(TopController::class.java)
-  @PersistenceContext
-  private lateinit var entityManager: EntityManager
 
   @Autowired
   private lateinit var dataSource: DataSource
@@ -38,12 +30,12 @@ class TopController {
   @ResponseBody
   fun query(model: Map<String, Any>,
             @RequestParam("sql") sql: String) :Map<String, Any>{
-    logger.info("sql=" + sql)
-    var conn = dataSource.getConnection()
+    logger.info("sql=$sql")
+    var conn = dataSource.connection
     val statement = conn.prepareStatement(sql)
     statement.execute()
     val rs = statement.resultSet
-    var columnCount = rs.getMetaData().getColumnCount();
+    var columnCount = rs.metaData.columnCount;
     val header = ArrayList<String>()
     for (i in 1..columnCount) {
       header.add(rs.metaData.getColumnName(i))

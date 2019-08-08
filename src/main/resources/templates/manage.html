@@ -11,7 +11,7 @@
     display: flex;
   }
   #contents aside{
-    width: 100px;
+    width: 200px;
   }
 </style>
 <script>
@@ -49,13 +49,19 @@ function postData(url, data) {
     referrer: 'no-referrer', // no-referrer, *client
     body: form, // body data type must match "Content-Type" header
   })
-  .then(response => response.json()); // parses JSON response into native JavaScript objects
+  .then(response => {
+    if (!response.ok) {
+      throw response;
+    }
+    return response.json()
+  });
 }
 function runQuery() {
   let sql = document.getElementById('sql').value;
   postData('/query', {"sql": sql}).then(result => {
-    var header = result["head"];
-    var body = result["body"];
+    let json = result;
+    var header = json["head"];
+    var body = json["body"];
 
     var table = "";
     var cols = header.length;
@@ -73,7 +79,12 @@ function runQuery() {
       table += "</tr>";
     }
     document.getElementById('result').innerHTML = "<table>" + table + "</table>";
-
+  }).catch(function(err) {
+    // console.error(err);
+    err.text().then(errorMessage => {
+      let json = JSON.parse(errorMessage);
+      alert(json.message);
+    })
   });
 }
 function saveDialog() {
@@ -82,7 +93,8 @@ function saveDialog() {
     let allData = loadData();
     let sql = document.getElementById('sql').value;
     allData.push({name: saveName, sql: sql});
-    saveData(allData);
+    saveData(allData); // TODO Promise
+    refreshList();
   }
 }
 
@@ -130,15 +142,17 @@ function deleteQuery() {
 <h1>Mane</h1>
 <section id="contents">
   <aside id="links">
-
   </aside>
   <article>
-    <textarea id="sql" cols="30" rows="10"></textarea>
-    <input type="button" onclick="runQuery()" value="Run">
-    <input type="button" onclick="saveDialog()" value="Save">
-    <input type="button" onclick="updateQuery()" value="Update" id="update_button" disabled="disabled">
-    <input type="button" onclick="deleteQuery()" value="Delete" id="delete_button" disabled="disabled">
-
+    <p>
+      <textarea id="sql" style="width: 700px;height: 150px;"></textarea>
+    </p>
+    <p>
+      <input type="button" onclick="runQuery()" value="Run">
+      <input type="button" onclick="saveDialog()" value="Save">
+      <input type="button" onclick="updateQuery()" value="Update" id="update_button" disabled="disabled">
+      <input type="button" onclick="deleteQuery()" value="Delete" id="delete_button" disabled="disabled">
+    </p>
     <div id="result"></div>
   </article>
 </section>
