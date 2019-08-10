@@ -13,6 +13,21 @@
   #contents aside{
     width: 200px;
   }
+  #links p {
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+  }
+  #result table {
+    border-collapse: collapse;
+  }
+  #result table tr th {
+    background-color: #dddddd;
+    border: 1px solid #aaa;
+  }
+  #result table tr td {
+    background-color: #fbfbfb;
+    border: 1px solid #aaa;
+  }
 </style>
 <script>
 const dataKey = 'aiueo';
@@ -143,7 +158,7 @@ function deleteQuery() {
 <section id="contents">
   <aside id="links">
   </aside>
-  <article>
+  <article style="width: calc(100% - 200px); overflow: scroll;">
     <p>
       <textarea id="sql" style="width: 700px;height: 150px;"></textarea>
     </p>
