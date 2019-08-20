@@ -1,7 +1,6 @@
 package com.github.horitaku1124.db_manager.controller
 
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -9,13 +8,9 @@ import org.springframework.web.bind.annotation.ResponseBody
 import java.util.*
 import javax.sql.DataSource
 
-
 @Controller
-class TopController {
+class TopController(private var dataSource: DataSource) {
   private val logger = LoggerFactory.getLogger(TopController::class.java)
-
-  @Autowired
-  private lateinit var dataSource: DataSource
 
   @RequestMapping("/")
   fun index() :String{
