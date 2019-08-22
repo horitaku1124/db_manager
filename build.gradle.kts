@@ -26,6 +26,7 @@ dependencies {
 	implementation("mysql:mysql-connector-java")
 //	implementation("com.oraclecom.oracle:ojdbc6:12.1.0.1-atlassian-hosted")
 
+	implementation("org.springframework.boot:spring-boot-devtools")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 

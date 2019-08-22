@@ -5,6 +5,9 @@
 <meta name="viewport"
       content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+<script src="/js/query_node.js" type="application/javascript"></script>
+<script src="/js/query_parser.js" type="application/javascript"></script>
 <title>Manage</title>
 <style>
   #contents {
@@ -73,6 +76,10 @@ function postData(url, data) {
 }
 function runQuery() {
   let sql = document.getElementById('sql').value;
+
+  let parser = new QueryParser({});
+  console.log(parser.lexicalAnalysis(sql));
+
   postData('/query', {"sql": sql}).then(result => {
     let json = result;
     var header = json["head"];
@@ -102,6 +109,11 @@ function runQuery() {
     })
   });
 }
+
+function downloadCsv() {
+  
+}
+
 function saveDialog() {
   let saveName = window.prompt("Enter your name : ", "");
   if (saveName) {
@@ -120,6 +132,7 @@ function openLink(index) {
   document.getElementById('sql').value = row["sql"];
   document.getElementById('update_button').removeAttribute("disabled");
   document.getElementById('delete_button').removeAttribute("disabled");
+  document.getElementById('download_button').removeAttribute("disabled");
 }
 
 function refreshList() {
@@ -148,13 +161,14 @@ function deleteQuery() {
     openedIndex = null;
     document.getElementById('update_button').setAttribute("disabled", "disabled");
     document.getElementById('delete_button').setAttribute("disabled", "disabled");
+    document.getElementById('download_button').setAttribute("disabled", "disabled");
     refreshList();
   }
 }
 </script>
 </head>
 <body>
-<h1>Mane</h1>
+<p>DB Management</p>
 <section id="contents">
   <aside id="links">
   </aside>
@@ -167,6 +181,7 @@ function deleteQuery() {
       <input type="button" onclick="saveDialog()" value="Save">
       <input type="button" onclick="updateQuery()" value="Update" id="update_button" disabled="disabled">
       <input type="button" onclick="deleteQuery()" value="Delete" id="delete_button" disabled="disabled">
+      <input type="button" onclick="downloadCsv()" value="CSV" id="download_button" disabled="disabled">
     </p>
     <div id="result"></div>
   </article>
