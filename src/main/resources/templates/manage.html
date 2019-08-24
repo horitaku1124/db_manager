@@ -44,7 +44,7 @@ function loadData() {
 }
 function saveData(data) {
   let newData = [];
-  for (row of data) {
+  for (let row of data) {
     if (row) {
       newData.push(row);
     }
@@ -158,6 +158,7 @@ function openLink(index) {
   let row = allData[index];
   openedIndex = index;
   document.getElementById('sql').value = row["sql"];
+  document.getElementById('query_name').innerText = row["name"];
   document.getElementById('update_button').removeAttribute("disabled");
   document.getElementById('delete_button').removeAttribute("disabled");
   document.getElementById('download_button').removeAttribute("disabled");
@@ -186,9 +187,11 @@ function deleteQuery() {
     let allData = loadData();
     delete allData[openedIndex];
     saveData(allData);
-    openedIndex = null;
+    openedIndex = null;  document.getElementById('query_name').innerText = " ";
+
     document.getElementById('update_button').setAttribute("disabled", "disabled");
     document.getElementById('delete_button').setAttribute("disabled", "disabled");
+    document.getElementById('download_button').setAttribute("disabled", "disabled");
     document.getElementById('download_button').setAttribute("disabled", "disabled");
     refreshList();
   }
@@ -201,6 +204,7 @@ function deleteQuery() {
   <aside id="links">
   </aside>
   <article style="width: calc(100% - 200px); overflow: scroll;">
+    <h4 id="query_name"></h4>
     <p>
       <textarea id="sql" style="width: 700px;height: 150px;"></textarea>
     </p>
