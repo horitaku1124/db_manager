@@ -307,7 +307,7 @@ class QueryParser {
         }
         return queryTokensList;
     }
-    
+
     convert(sql)
     {
         let queryTokensList = this.tokernise(sql);

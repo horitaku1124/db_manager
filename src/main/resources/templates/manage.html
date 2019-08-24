@@ -78,36 +78,64 @@ function runQuery() {
   let sql = document.getElementById('sql').value;
 
   let parser = new QueryParser({});
-  console.log(parser.lexicalAnalysis(sql));
-
-  postData('/query', {"sql": sql}).then(result => {
-    let json = result;
-    var header = json["head"];
-    var body = json["body"];
-
-    var table = "";
-    var cols = header.length;
-    table += "<tr>";
-    for (let i = 0;i < cols;i++) {
-      table += "<th>" + header[i] + "</th>";
+  let tokens = parser.lexicalAnalysis(sql);
+  let sqlBuff = "";
+  let sqlList = [];
+  for (let token of tokens) {
+    if (token.startsWith("--")) {
+      continue;
     }
-    table += "</tr>";
+    if (token === ";") {
+      sqlList.push(sqlBuff);
+      sqlBuff = "";
+      continue;
+    }
+    sqlBuff += " " + token;
+  }
+  if (sqlBuff !== '') {
+    sqlList.push(sqlBuff);
+  }
+  console.log(sqlList);
+  let index = 1;
+  let tables = "";
+  let exeQuery = (query) => {
+    postData('/query', {"sql": query}).then(result => {
+      let json = result;
+      let header = json["head"];
+      let body = json["body"];
 
-    for (let row of body) {
-      table += "<tr>";
+      let cols = header.length;
+      tables += "<table>";
+      tables += "<tr>";
       for (let i = 0;i < cols;i++) {
-        table += "<td>" + row[i] + "</td>";
+        tables += "<th>" + header[i] + "</th>";
       }
-      table += "</tr>";
-    }
-    document.getElementById('result').innerHTML = "<table>" + table + "</table>";
-  }).catch(function(err) {
-    // console.error(err);
-    err.text().then(errorMessage => {
-      let json = JSON.parse(errorMessage);
-      alert(json.message);
-    })
-  });
+      tables += "</tr>";
+
+      for (let row of body) {
+        tables += "<tr>";
+        for (let i = 0;i < cols;i++) {
+          tables += "<td>" + row[i] + "</td>";
+        }
+        tables += "</tr>";
+      }
+      tables += "</table><br />";
+      if (index >= sqlList.length) {
+        document.getElementById('result').innerHTML = tables;
+      } else {
+        exeQuery(sqlList[index]);
+        index++;
+      }
+    }).catch(function(err) {
+      // console.error(err);
+      err.text().then(errorMessage => {
+        let json = JSON.parse(errorMessage);
+        alert(json.message);
+      })
+    });
+  };
+  exeQuery(sqlList[0]);
+
 }
 
 function downloadCsv() {
